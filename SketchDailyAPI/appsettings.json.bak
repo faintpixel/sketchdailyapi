@@ -7,6 +7,6 @@
   },
   "AllowedHosts": "*",
   "AppSettings": {
-    "TestSetting": "from appsettings"
+    "TestSetting": "top secret"
   }  
 }
