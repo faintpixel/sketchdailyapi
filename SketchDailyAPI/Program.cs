@@ -13,10 +13,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 //builder.Services.Configure<AzureDevopsSettings>(builder.Configuration.GetSection("AzureDevops"));
 //builder.Services.Configure<Auth0Settings>(builder.Configuration.GetSection("Auth0"));
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 // Add services to the container.
 //var domain = $"https://{builder.Configuration["Auth0:Domain"]}/";
 //var audience = builder.Configuration["Auth0:Audience"];
+
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 //builder.Services.AddAuthentication(options =>
 //{
