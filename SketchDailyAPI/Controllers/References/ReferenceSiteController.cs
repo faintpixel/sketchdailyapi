@@ -9,6 +9,7 @@ namespace SketchDailyAPI.Controllers.References
 {
     [ApiController]
     [Route("[controller]")]
+    [Tags("ReferenceSite")]
     public class ReferenceSiteController
     {
         private readonly AppSettings _appSettings;

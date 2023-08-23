@@ -1,40 +1,44 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using SketchDailyAPI.DAO.Queryables;
 using SketchDailyAPI.DAO.References;
-using SketchDailyAPI.Models;
+using SketchDailyAPI.Models.References.Structures;
 using SketchDailyAPI.Models.References;
-using SketchDailyAPI.Models.References.Animals;
+using Microsoft.Extensions.Options;
+using SketchDailyAPI.Models;
 
 namespace SketchDailyAPI.Controllers.References
 {
+    /// <summary>
+    /// API for working with structure references
+    /// </summary>
     [ApiController]
     [Route("ReferenceSite/[controller]")]
     [Tags("ReferenceSite")]
-    public class AnimalsController : BaseController, IReferenceController<AnimalReference, AnimalClassifications>
+    public class StructuresController : BaseController, IReferenceController<StructureReference, StructureClassifications>
     {
-        private readonly AppSettings _appSettings;
-        private ReferenceDAO<AnimalReference, AnimalClassifications> _dao;
+        private ReferenceDAO<StructureReference, StructureClassifications> _dao;
 
-        public AnimalsController(IOptions<AppSettings> appSettings)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public StructuresController(IOptions<AppSettings> appSettings)
         {
-            _appSettings = appSettings.Value;
-            var queryable = new AnimalsQueryable();
-            _dao = new ReferenceDAO<AnimalReference, AnimalClassifications>(Models.References.ReferenceType.Animal, queryable, appSettings.Value);
+            var queryable = new StructuresQueryable();
+            _dao = new ReferenceDAO<StructureReference, StructureClassifications>(ReferenceType.Structure, queryable, appSettings.Value);
         }
 
         /// <summary>
-        /// Get animals
+        /// Get Structures
         /// </summary>
         /// <returns></returns>
         [HttpGet]
         [Authorize("admin")]
         [Route("")]
-        public async Task<List<AnimalReference>> Search([FromQuery(Name = "")] AnimalClassifications criteria, [FromQuery(Name = "")] OffsetLimit offsetLimit)
+        public async Task<List<StructureReference>> Search([FromQuery(Name = "")] StructureClassifications criteria, [FromQuery(Name = "")] OffsetLimit offsetLimit)
         {
             if (criteria == null)
-                criteria = new AnimalClassifications();
+                criteria = new StructureClassifications();
 
             var image = await _dao.Search(criteria, offsetLimit.Offset, offsetLimit.Limit);
 
@@ -50,10 +54,10 @@ namespace SketchDailyAPI.Controllers.References
         /// <returns></returns>
         [HttpPost]
         [Route("Next")]
-        public async Task<AnimalReference> GetNext([FromQuery(Name = "")] AnimalClassifications criteria, [FromBody] List<string> excludeIds, [FromQuery] bool? recentImagesOnly = null)
+        public async Task<StructureReference> GetNext([FromQuery(Name = "")] StructureClassifications criteria, [FromBody] List<string> excludeIds, [FromQuery] bool? recentImagesOnly = null)
         {
             if (criteria == null)
-                criteria = new AnimalClassifications();
+                criteria = new StructureClassifications();
             if (excludeIds == null)
                 excludeIds = new List<string>();
 
@@ -63,14 +67,14 @@ namespace SketchDailyAPI.Controllers.References
         }
 
         /// <summary>
-        /// Save animals
+        /// Save structures
         /// </summary>
         /// <param name="images"></param>
         /// <returns></returns>
         [HttpPost]
         [Authorize]
         [Route("")]
-        public async Task<List<AnimalReference>> Save([FromBody] List<AnimalReference> images)
+        public async Task<List<StructureReference>> Save([FromBody] List<StructureReference> images)
         {
             var user = GetCurrentUser();
             var results = await _dao.Save(images, user);
@@ -78,17 +82,17 @@ namespace SketchDailyAPI.Controllers.References
         }
 
         /// <summary>
-        /// Gets the number of animal references matching the criteria
+        /// Gets the number of structure references matching the criteria
         /// </summary>
         /// <param name="classifications"></param>
         /// <param name="recentImagesOnly"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("Count")]
-        public async Task<int> Count([FromQuery(Name = "")] AnimalClassifications classifications, [FromQuery] bool? recentImagesOnly)
+        public async Task<int> Count([FromQuery(Name = "")] StructureClassifications classifications, [FromQuery] bool? recentImagesOnly)
         {
             if (classifications == null)
-                classifications = new AnimalClassifications();
+                classifications = new StructureClassifications();
             return await _dao.Count(classifications, recentImagesOnly);
         }
     }

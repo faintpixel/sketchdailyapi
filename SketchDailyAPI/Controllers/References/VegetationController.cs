@@ -1,40 +1,44 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using SketchDailyAPI.DAO.Queryables;
 using SketchDailyAPI.DAO.References;
-using SketchDailyAPI.Models;
+using SketchDailyAPI.Models.References.Vegetation;
 using SketchDailyAPI.Models.References;
-using SketchDailyAPI.Models.References.Animals;
+using Microsoft.Extensions.Options;
+using SketchDailyAPI.Models;
 
 namespace SketchDailyAPI.Controllers.References
 {
+    /// <summary>
+    /// API for working with vegetation references
+    /// </summary>
     [ApiController]
     [Route("ReferenceSite/[controller]")]
     [Tags("ReferenceSite")]
-    public class AnimalsController : BaseController, IReferenceController<AnimalReference, AnimalClassifications>
+    public class VegetationController : BaseController, IReferenceController<VegetationReference, VegetationClassifications>
     {
-        private readonly AppSettings _appSettings;
-        private ReferenceDAO<AnimalReference, AnimalClassifications> _dao;
+        private ReferenceDAO<VegetationReference, VegetationClassifications> _dao;
 
-        public AnimalsController(IOptions<AppSettings> appSettings)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public VegetationController(IOptions<AppSettings> appSettings)
         {
-            _appSettings = appSettings.Value;
-            var queryable = new AnimalsQueryable();
-            _dao = new ReferenceDAO<AnimalReference, AnimalClassifications>(Models.References.ReferenceType.Animal, queryable, appSettings.Value);
+            var queryable = new VegetationQueryable();
+            _dao = new ReferenceDAO<VegetationReference, VegetationClassifications>(ReferenceType.Vegetation, queryable, appSettings.Value);
         }
 
         /// <summary>
-        /// Get animals
+        /// Get vegetation
         /// </summary>
         /// <returns></returns>
         [HttpGet]
         [Authorize("admin")]
         [Route("")]
-        public async Task<List<AnimalReference>> Search([FromQuery(Name = "")] AnimalClassifications criteria, [FromQuery(Name = "")] OffsetLimit offsetLimit)
+        public async Task<List<VegetationReference>> Search([FromQuery(Name = "")] VegetationClassifications criteria, [FromQuery(Name = "")] OffsetLimit offsetLimit)
         {
             if (criteria == null)
-                criteria = new AnimalClassifications();
+                criteria = new VegetationClassifications();
 
             var image = await _dao.Search(criteria, offsetLimit.Offset, offsetLimit.Limit);
 
@@ -50,10 +54,10 @@ namespace SketchDailyAPI.Controllers.References
         /// <returns></returns>
         [HttpPost]
         [Route("Next")]
-        public async Task<AnimalReference> GetNext([FromQuery(Name = "")] AnimalClassifications criteria, [FromBody] List<string> excludeIds, [FromQuery] bool? recentImagesOnly = null)
+        public async Task<VegetationReference> GetNext([FromQuery(Name = "")] VegetationClassifications criteria, [FromBody] List<string> excludeIds, [FromQuery] bool? recentImagesOnly = null)
         {
             if (criteria == null)
-                criteria = new AnimalClassifications();
+                criteria = new VegetationClassifications();
             if (excludeIds == null)
                 excludeIds = new List<string>();
 
@@ -63,32 +67,33 @@ namespace SketchDailyAPI.Controllers.References
         }
 
         /// <summary>
-        /// Save animals
+        /// Save vegetation
         /// </summary>
         /// <param name="images"></param>
         /// <returns></returns>
         [HttpPost]
         [Authorize]
         [Route("")]
-        public async Task<List<AnimalReference>> Save([FromBody] List<AnimalReference> images)
+        public async Task<List<VegetationReference>> Save([FromBody] List<VegetationReference> images)
         {
             var user = GetCurrentUser();
+
             var results = await _dao.Save(images, user);
             return images; // TO DO - return something better
         }
 
         /// <summary>
-        /// Gets the number of animal references matching the criteria
+        /// Gets the number of vegetation references matching the criteria
         /// </summary>
         /// <param name="classifications"></param>
         /// <param name="recentImagesOnly"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("Count")]
-        public async Task<int> Count([FromQuery(Name = "")] AnimalClassifications classifications, [FromQuery] bool? recentImagesOnly)
+        public async Task<int> Count([FromQuery(Name = "")] VegetationClassifications classifications, [FromQuery] bool? recentImagesOnly)
         {
             if (classifications == null)
-                classifications = new AnimalClassifications();
+                classifications = new VegetationClassifications();
             return await _dao.Count(classifications, recentImagesOnly);
         }
     }
