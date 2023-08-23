@@ -17,4 +17,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SketchDailyAPI.DAO\SketchDailyAPI.DAO.csproj" />
+    <ProjectReference Include="..\SketchDailyAPI.Models\SketchDailyAPI.Models.csproj" />
+  </ItemGroup>
+
 </Project>

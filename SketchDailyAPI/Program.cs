@@ -7,32 +7,37 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Security.Claims;
 using SketchDailyAPI;
-
+using SketchDailyAPI.Models;
+using SketchDailyAPI.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.Services.Configure<AzureDevopsSettings>(builder.Configuration.GetSection("AzureDevops"));
-//builder.Services.Configure<Auth0Settings>(builder.Configuration.GetSection("Auth0"));
+builder.Services.Configure<Auth0Settings>(builder.Configuration.GetSection("Auth0"));
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 // Add services to the container.
-//var domain = $"https://{builder.Configuration["Auth0:Domain"]}/";
-//var audience = builder.Configuration["Auth0:Audience"];
+var domain = $"https://{builder.Configuration["Auth0:Domain"]}/";
+var audience = builder.Configuration["Auth0:Audience"];
 
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//}).AddJwtBearer(options =>
-//{
-//    options.Authority = domain;
-//    options.Audience = audience;
-//});
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.Authority = domain;
+    options.Audience = audience;
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("admin", policy => policy.Requirements.Add(new HasRoleRequirement("admin", domain)));
+});
 
 builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 {
@@ -40,49 +45,47 @@ builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 }));
 
 
-//builder.Services.AddControllers(o =>
-//{
-//    o.Conventions.Add(new HideBaseControllerConvention());
-//});
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    var jwtSecurityScheme = new OpenApiSecurityScheme
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        BearerFormat = "JWT",
-        Name = "JWT Authentication",
+        Description =
+        "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",
+        Name = "Authorization",
         In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = JwtBearerDefaults.AuthenticationScheme,
-        Description = "Put **_ONLY_** your JWT Bearer token on textbox below!",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
 
-
-        Reference = new OpenApiReference
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
         {
-            Id = JwtBearerDefaults.AuthenticationScheme,
-            Type = ReferenceType.SecurityScheme
-        }
-    };
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
 
-    c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+            },
+            new List<string>()
+        }
+    });
 
     c.OperationFilter<SecurityRequirementsOperationFilter>();
-
 });
 
-builder.Services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, HasRoleHandler>();
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
 
 app.UseSwagger();
 app.UseSwaggerUI();

@@ -5,6 +5,10 @@ VisualStudioVersion = 17.7.34009.444
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SketchDailyAPI", "SketchDailyAPI\SketchDailyAPI.csproj", "{ADF399AF-1711-43A9-B0C4-E2775C0A2FD7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SketchDailyAPI.DAO", "SketchDailyAPI.DAO\SketchDailyAPI.DAO.csproj", "{4030D8FF-03BF-4F99-A22C-D7F11C548F00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SketchDailyAPI.Models", "SketchDailyAPI.Models\SketchDailyAPI.Models.csproj", "{DD7B293B-FB04-4039-B9E1-F67744C55F6D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{ADF399AF-1711-43A9-B0C4-E2775C0A2FD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADF399AF-1711-43A9-B0C4-E2775C0A2FD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADF399AF-1711-43A9-B0C4-E2775C0A2FD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4030D8FF-03BF-4F99-A22C-D7F11C548F00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4030D8FF-03BF-4F99-A22C-D7F11C548F00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4030D8FF-03BF-4F99-A22C-D7F11C548F00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4030D8FF-03BF-4F99-A22C-D7F11C548F00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD7B293B-FB04-4039-B9E1-F67744C55F6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD7B293B-FB04-4039-B9E1-F67744C55F6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD7B293B-FB04-4039-B9E1-F67744C55F6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD7B293B-FB04-4039-B9E1-F67744C55F6D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

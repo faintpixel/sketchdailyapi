@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace SketchDailyAPI
+namespace SketchDailyAPI.Auth
 {
     public class HasScopeHandler : AuthorizationHandler<HasScopeRequirement>
     {
