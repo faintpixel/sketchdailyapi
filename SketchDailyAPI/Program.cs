@@ -17,7 +17,7 @@ builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSet
 
 // Add services to the container.
 var domain = $"https://{builder.Configuration["Auth0:Domain"]}/";
-var audience = builder.Configuration["Auth0:Audience"];
+var audience = builder.Configuration["Auth0:ClientID"];
 
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
