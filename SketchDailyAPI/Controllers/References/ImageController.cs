@@ -23,7 +23,6 @@ namespace SketchDailyAPI.Controllers.References
     public class ImageController : BaseController
     {
         private FileDAO _fileDAO;
-        private BatchDAO _batchDAO;
         private Logger _logger;
         private AppSettings _appSettings;
 
@@ -34,7 +33,6 @@ namespace SketchDailyAPI.Controllers.References
         public ImageController(Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IOptions<AppSettings> appSettings)
         {
             _fileDAO = new FileDAO(hostingEnvironment.WebRootPath, appSettings.Value);
-            _batchDAO = new BatchDAO(appSettings.Value);
             _logger = new Logger("ImageController", appSettings.Value);
             _appSettings = appSettings.Value;
         }
@@ -45,7 +43,7 @@ namespace SketchDailyAPI.Controllers.References
         /// <returns>Batch id</returns>
         [HttpPost]
         [Authorize]
-        [Route("api/Image")]
+        [Route("")]
         public ImageSaveResults UploadImage([FromForm] string batch)
         {
             throw new NotImplementedException("Need to implement");
@@ -70,27 +68,14 @@ namespace SketchDailyAPI.Controllers.References
             //    _logger.Log("UploadImage", ex, batch);
             //}
             //return results;
-        }
-
-        /// <summary>
-        /// Gets batches
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        [Authorize]
-        [Route("api/Batches")]
-        public async Task<List<Batch>> GetBatches()
-        {
-            var user = GetCurrentUser().Email;
-            return await _batchDAO.GetUserBatches(user);
-        }
+        }        
 
         /// <summary>
         /// Report image
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("api/Images/{id}/Report")]
+        [Route("{id}/Report")]
         public bool ReportImage(string id, [FromBody] Report report)
         {
             report.ImageId = id;
@@ -100,74 +85,5 @@ namespace SketchDailyAPI.Controllers.References
             return true;
         }
 
-        [Authorize]
-        [HttpDelete]
-        [Route("api/Batches/{id}")]
-        public async Task<bool> DeleteBatch(string id)
-        {
-            var user = GetCurrentUser();
-            await _batchDAO.DeleteReference(id, user);
-            return true;
-        }
-
-        /// <summary>
-        /// Gets images from batch
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Authorize]
-        [Route("api/Batches/{id}/Images")]
-        public async Task<BatchImages> GetBatchImages(string id)
-        {
-            var results = new BatchImages();
-
-            var currentUser = GetCurrentUser();
-            results.Batch = await _batchDAO.Get(id);
-
-            if (results.Batch == null)
-                return results;
-
-            if (!currentUser.IsAdmin && currentUser.Email != results.Batch.User)
-                throw new Exception("Unauthorized");
-
-            if (results.Batch.Type == ReferenceType.Animal)
-            {
-                var queryable = new AnimalsQueryable();
-                var animalsDAO = new ReferenceDAO<AnimalReference, AnimalClassifications>(ReferenceType.Animal, queryable, _appSettings);
-                var images = await animalsDAO.Search(new AnimalClassifications() { BatchId = id });
-                results.Images = images.ToList<object>();
-            }
-            else if (results.Batch.Type == ReferenceType.BodyPart)
-            {
-                var queryable = new BodyPartsQueryable();
-                var bodyPartsDAO = new ReferenceDAO<BodyPartReference, BodyPartClassifications>(ReferenceType.BodyPart, queryable, _appSettings);
-                var images = await bodyPartsDAO.Search(new BodyPartClassifications { BatchId = id });
-                results.Images = images.ToList<object>();
-            }
-            else if (results.Batch.Type == ReferenceType.FullBody)
-            {
-                var queryable = new FullBodiesQueryable();
-                var fullBodiesDAO = new ReferenceDAO<FullBodyReference, FullBodyClassifications>(ReferenceType.FullBody, queryable, _appSettings);
-                var images = await fullBodiesDAO.Search(new FullBodyClassifications { BatchId = id });
-                results.Images = images.ToList<object>();
-            }
-            else if (results.Batch.Type == ReferenceType.Vegetation)
-            {
-                var queryable = new VegetationQueryable();
-                var vegetationDAO = new ReferenceDAO<VegetationReference, VegetationClassifications>(ReferenceType.Vegetation, queryable, _appSettings);
-                var images = await vegetationDAO.Search(new VegetationClassifications { BatchId = id });
-                results.Images = images.ToList<object>();
-            }
-            else if (results.Batch.Type == ReferenceType.Structure)
-            {
-                var queryable = new StructuresQueryable();
-                var structuresDAO = new ReferenceDAO<StructureReference, StructureClassifications>(ReferenceType.Structure, queryable, _appSettings);
-                var images = await structuresDAO.Search(new StructureClassifications { BatchId = id });
-                results.Images = images.ToList<object>();
-            }
-
-            return results;
-        }
     }
 }
