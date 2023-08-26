@@ -8,7 +8,7 @@ namespace SketchDailyAPI.Models.References
 {
     public class Contact
     {
-        public string Name { get; set; }
-        public string Webpage { get; set; }
+        public string? Name { get; set; }
+        public string? Webpage { get; set; }
     }
 }

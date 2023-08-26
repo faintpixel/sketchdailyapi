@@ -34,7 +34,7 @@ namespace SketchDailyAPI.DAO.Queryables
         {
             var query = collection.AsQueryable().OrderByDescending(x => x.UploadDate).Take(1);
             var item = query.First();
-            return item.UploadDate;
+            return item.UploadDate.Value;
         }
     }
 }
