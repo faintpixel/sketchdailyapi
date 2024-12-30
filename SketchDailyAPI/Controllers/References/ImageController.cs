@@ -30,9 +30,9 @@ namespace SketchDailyAPI.Controllers.References
         /// Constructor
         /// </summary>
         /// <param name="hostingEnvironment"></param>
-        public ImageController(Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IOptions<AppSettings> appSettings)
+        public ImageController(Microsoft.AspNetCore.Hosting.IHostingEnvironment hostingEnvironment, IOptions<AppSettings> appSettings, IOptions<SpacesSettings> spacesSettings)
         {
-            _fileDAO = new FileDAO(hostingEnvironment.WebRootPath, appSettings.Value);
+            _fileDAO = new FileDAO(hostingEnvironment.WebRootPath, appSettings.Value, spacesSettings.Value);
             _logger = new Logger("ImageController", appSettings.Value);
             _appSettings = appSettings.Value;
         }
@@ -46,28 +46,27 @@ namespace SketchDailyAPI.Controllers.References
         [Route("")]
         public ImageSaveResults UploadImage([FromForm] string batch)
         {
-            throw new NotImplementedException("Need to implement");
-            //var results = new ImageSaveResults();
-            //Batch deserializedBatch = null;
-            //try
-            //{
-            //    var converter = new StringEnumConverter();
-            //    deserializedBatch = JsonConvert.DeserializeObject<Batch>(batch, converter);
-            //    deserializedBatch.User = GetCurrentUser().Email;
-            //    var files = Request.Form.Files;
-            //    var images = _fileDAO.Upload(files, ref deserializedBatch, GetCurrentUser());
-            //    results.Images = images;
-            //    results.BatchId = deserializedBatch.Id;
-            //    results.Success = true;
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (batch != null)
-            //        results.BatchId = deserializedBatch.Id;
-            //    results.Success = false;
-            //    _logger.Log("UploadImage", ex, batch);
-            //}
-            //return results;
+            var results = new ImageSaveResults();
+            Batch deserializedBatch = null;
+            try
+            {
+                var converter = new StringEnumConverter();
+                deserializedBatch = JsonConvert.DeserializeObject<Batch>(batch, converter);
+                deserializedBatch.User = GetCurrentUser().Email;
+                var files = Request.Form.Files;
+                var images = _fileDAO.Upload(files, ref deserializedBatch, GetCurrentUser());
+                results.Images = images;
+                results.BatchId = deserializedBatch.Id;
+                results.Success = true;
+            }
+            catch (Exception ex)
+            {
+                if (batch != null)
+                    results.BatchId = deserializedBatch.Id;
+                results.Success = false;
+                _logger.Log("UploadImage", ex, batch);
+            }
+            return results;
         }        
 
         /// <summary>

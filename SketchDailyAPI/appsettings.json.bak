@@ -7,6 +7,21 @@
   },
   "AllowedHosts": "*",
   "AppSettings": {
-    "TestSetting": "top secret"
-  }  
+    "MongoDBConnectionString": ""
+  },
+  "Auth0": {
+    "Domain": "",
+    "Audience": "",
+    "ClientID": "",
+    "ClientSecret": "",
+    "APIClientId": "",
+    "APIClientSecret": ""
+  },
+  "Spaces": {
+    "SpaceName": "",
+    "Endpoint": "",
+    "ImagePath": "",
+    "AccessKey": "",
+    "SecretKey": ""
+  }
 }

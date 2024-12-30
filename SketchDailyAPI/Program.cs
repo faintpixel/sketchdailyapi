@@ -14,6 +14,7 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<Auth0Settings>(builder.Configuration.GetSection("Auth0"));
+builder.Services.Configure<SpacesSettings>(builder.Configuration.GetSection("Spaces"));
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 // Add services to the container.
@@ -42,9 +43,13 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 {
-    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+    builder.WithOrigins(
+        "http://localhost:4200",
+        "https://www.reference.sketchdaily.net",
+        "https://www.sketchdaily.net",
+        "https://sketchdaily.net"
+    ).AllowAnyMethod().AllowAnyHeader().AllowCredentials();
 }));
-
 
 builder.Services.AddControllers().AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); }); 
 
@@ -92,8 +97,8 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseRouting();
 app.UseCors("corsapp");
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
