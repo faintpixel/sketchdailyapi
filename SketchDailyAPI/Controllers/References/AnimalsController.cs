@@ -84,6 +84,7 @@ namespace SketchDailyAPI.Controllers.References
         /// <param name="recentImagesOnly"></param>
         /// <returns></returns>
         [HttpGet]
+        [HttpHead]
         [Route("Count")]
         public async Task<int> Count([FromQuery(Name = "")] AnimalClassifications classifications, [FromQuery] bool? recentImagesOnly)
         {
